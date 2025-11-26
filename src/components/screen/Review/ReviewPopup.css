@@ -1,0 +1,151 @@
+.review-popup-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d2b1e 0%, #1c4b3c 50%, #1c4133 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.review-popup {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  max-width: 500px;
+  width: 100%;
+}
+
+.review-title {
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+}
+
+.review-subtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e1e1e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.rating-section {
+  text-align: center;
+}
+
+.rating-section p {
+  margin-bottom: 15px;
+  color: #555;
+  font-weight: bold;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.rating-btn {
+  padding: 15px 25px;
+  border: 2px solid #e1e1e1;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.rating-btn.selected {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+  transform: scale(1.05);
+}
+
+.rating-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.review-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.submit-review-btn, .skip-review-btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-review-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+}
+
+.skip-review-btn {
+  background: #f8f9fa;
+  color: #666;
+  border: 2px solid #e1e1e1;
+}
+
+.submit-review-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.skip-review-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .review-popup {
+    padding: 30px 20px;
+  }
+  
+  .rating-buttons {
+    flex-direction: column;
+  }
+  
+  .review-buttons {
+    flex-direction: column;
+  }
+  
+  .review-title {
+    font-size: 2rem;
+  }
+}

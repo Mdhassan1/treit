@@ -1,0 +1,128 @@
+.mcq-question {
+  text-align: center;
+  width: 100%;
+}
+
+.mcq-question h2 {
+  color: #929090;
+  margin-bottom: 30px;
+  font-size: 1.5rem; /* Increased size */
+}
+
+.question-text {
+  font-size: 24px; /* Increased from 18px to 24px */
+  margin-bottom: 40px; /* Increased margin */
+  color: #333;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.options-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px; /* Increased gap */
+  margin-top: 30px;
+}
+
+.option-btn {
+  padding: 25px 20px; /* Increased padding */
+  border: 2px solid #e1e1e1;
+  background: white;
+  border-radius: 12px; /* Slightly larger border radius */
+  font-size: 20px; /* Same font size for all options */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 90px; /* Increased min-height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 500; /* Added font weight for better readability */
+}
+
+.option-btn.selected {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  font-size: 20px; /* Ensure same font size */
+}
+
+.option-btn:hover:not(:disabled) {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.option-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.9; /* Slightly increased opacity */
+}
+
+.correct-answer {
+  background: #4caf50 !important;
+  color: white !important;
+  border-color: #4caf50 !important;
+  transform: scale(1.02);
+  font-size: 20px !important; /* Ensure same font size */
+  font-weight: 500 !important; /* Same font weight */
+}
+
+.wrong-answer {
+  background: #f44336 !important;
+  color: white !important;
+  border-color: #f44336 !important;
+  font-size: 20px !important; /* Ensure same font size */
+  font-weight: 500 !important; /* Same font weight */
+}
+
+.submit-btn {
+  margin-top: 40px; /* Increased margin */
+  padding: 18px 50px; /* Increased padding */
+  font-size: 1.3rem; /* Increased font size */
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+  color: white;
+  border: none;
+  border-radius: 30px; /* Slightly larger border radius */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px); /* Slightly larger hover effect */
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .options-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .mcq-question h2 {
+    font-size: 1.6rem; /* Adjusted for mobile */
+  }
+  
+  .question-text {
+    font-size: 20px; /* Adjusted for mobile */
+    margin-bottom: 30px;
+  }
+  
+  .option-btn {
+    padding: 20px 15px;
+    min-height: 80px;
+    font-size: 18px; /* Adjusted for mobile */
+  }
+  
+  .submit-btn {
+    padding: 16px 40px;
+    font-size: 1.2rem;
+    margin-top: 30px;
+  }
+}
