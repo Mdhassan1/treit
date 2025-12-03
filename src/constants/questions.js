@@ -11,7 +11,7 @@ export const QUESTIONS = {
     { id: 9, jumbled: "OKOB", correct: "BOOK" },
     { id: 10, jumbled: "ELEPOHTNE", correct: "TELEPHONE" },
     { id: 11, jumbled: "TOPALP", correct: "LAPTOP" },
-    { id: 12, jumbled: "EPHON", correct: "PHONE" },
+    { id: 12, jumbled: "EPOHN", correct: "PHONE" },
     { id: 13, jumbled: "LILETT", correct: "LITTLE" },
     { id: 14, jumbled: "GIB", correct: "BIG" },
     { id: 15, jumbled: "MALLS", correct: "SMALL" },
@@ -19,10 +19,10 @@ export const QUESTIONS = {
     { id: 17, jumbled: "QURAES", correct: "SQUARE" },
     { id: 18, jumbled: "NGLO", correct: "LONG" },
     { id: 19, jumbled: "TOSHR", correct: "SHORT" },
-    { id: 20, jumbled: "WIDE", correct: "WIDE" },
-    { id: 21, jumbled: "WONRG", correct: "WRONG" },
+    { id: 20, jumbled: "DIEW", correct: "WIDE" },
+    { id: 21, jumbled: "RONGW", correct: "WRONG" },
     { id: 22, jumbled: "GIRTH", correct: "RIGHT" },
-    { id: 23, jumbled: "HIGLT", correct: "LIGHT" },
+    { id: 23, jumbled: "FELT", correct: "LEFT" },
     { id: 24, jumbled: "KARD", correct: "DARK" },
     { id: 25, jumbled: "OTH", correct: "HOT" },
     { id: 26, jumbled: "DOLC", correct: "COLD" },
@@ -39,7 +39,7 @@ export const QUESTIONS = {
     { id: 37, jumbled: "DRAH", correct: "HARD" },
     { id: 38, jumbled: "FOTS", correct: "SOFT" },
     { id: 39, jumbled: "AVHEY", correct: "HEAVY" },
-    { id: 40, jumbled: "GILHT", correct: "LIGHT" },
+    { id: 40, jumbled: "LEFT", correct: "FELT" },
     { id: 41, jumbled: "HGHI", correct: "HIGH" },
     { id: 42, jumbled: "WOL", correct: "LOW" },
     { id: 43, jumbled: "SAFT", correct: "FAST" },
@@ -101,7 +101,7 @@ export const QUESTIONS = {
     {
       id: 6,
       question: "Which is the state flower of Tamil Nadu?",
-      options: ["Lotus", "Jasmine", "Rose", "Marigold"],
+      options: ["Lotus", "Jasmine", "Rose", "Glory Lily"],
       correct: "Glory Lily",
     },
     {
@@ -473,16 +473,16 @@ export const QUESTIONS = {
       },
       grid: [
         //0    1    2    3    4    5    6    7    8    9
-        [" ", "C", "H", "E", "N", "N", "A", "I", " ", "R"], //0 - CHENNAI, REACT
-        [" ", "P", " ", " ", " ", " ", "J", " ", " ", "E"], //1 - PYTHON, JAVA, REACT
-        [" ", "Y", "M", "U", "M", "B", "A", "I", " ", "A"], //2 - PYTHON, MUMBAI, JAVA, REACT
-        ["H", "T", " ", " ", " ", " ", "V", " ", " ", "C"], //3 - PYTHON, HTML, JAVA, REACT
-        ["T", "H", " ", " ", " ", " ", "A", " ", " ", "T"], //4 - PYTHON, HTML, JAVA, REACT
-        ["M", "O", " ", "D", "E", "L", "H", "I", " ", " "], //5 - PYTHON, HTML, DELHI
-        ["L", "N", "K", "O", "L", "K", "A", "T", "A", " "], //6 - HTML, KOLKATA
-        [" ", " ", " ", " ", " ", "C", "S", "S", " ", " "], //7 - CSS
-        ["B", "A", "N", "G", "A", "L", "O", "R", "E", " "], //8 - BANGALORE
-        [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "], //9
+        ["A", "C", "H", "E", "N", "N", "A", "I", "M", "R"], //0 - CHENNAI, REACT
+        ["U", "P", "Q", "W", "P", "Q", "J", "T", "C", "E"], //1 - PYTHON, JAVA, REACT
+        ["T", "Y", "M", "U", "M", "B", "A", "I", "O", "A"], //2 - PYTHON, MUMBAI, JAVA, REACT
+        ["H", "T", "A", "G", "A", "W", "V", "R", "Z", "C"], //3 - PYTHON, HTML, JAVA, REACT
+        ["T", "H", "S", "I", "E", "S", "A", "W", "C", "T"], //4 - PYTHON, HTML, JAVA, REACT
+        ["M", "O", "X", "D", "E", "L", "H", "I", "U", "N"], //5 - PYTHON, HTML, DELHI
+        ["L", "N", "K", "O", "L", "K", "A", "T", "A", "V"], //6 - HTML, KOLKATA
+        ["M", "U", "P", "S", "D", "C", "S", "S", "P", "E"], //7 - CSS
+        ["B", "A", "N", "G", "A", "L", "O", "R", "E", "O"], //8 - BANGALORE
+        ["D", "Q", "X", "P", "I", "A", "Q", "P", "D", "H"], //9
       ],
       clue: "Find Indian cities and programming languages",
       answer: "CROSSWORD",

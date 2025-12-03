@@ -96,18 +96,252 @@ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   color: #ffd93d;
 }
 
+/* GamePage.css - Update the game-area section */
+
 .game-area {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  padding: 40px;
-margin-top: 50px;
+  padding: 30px 20px;
+  margin-top: 50px;
   margin-bottom: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 70%;
+  width: 95%;
+  max-width: 800px;
   min-height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
+}
+
+/* For very small mobile screens */
+@media (max-width: 480px) {
+  .game-area {
+    padding: 20px 15px;
+    width: 100%;
+    margin-top: 40px;
+    border-radius: 15px;
+  }
+  
+  .left-header {
+    right: 10px;
+    top: 10px;
+    padding: 12px;
+    border-radius: 15px;
+  }
+  
+  .timer-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+  }
+  
+  .qs-text, .score-text {
+    font-size: 14px;
+  }
+}
+
+/* GamePage.css - Mobile First */
+
+.game-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d2b1e 0%, #1c4b3c 50%, #1c4133 100%);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.game-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.left-header {
+  position: fixed;
+  right: 15px;
+  top: 15px;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 12px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.timer-circle {
+  width: 70px;
+  height: 70px;
+  background: #246726;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.qs-score {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.qs-text,
+.score-text {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.game-area {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 25px 15px;
+  margin-top: 100px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .game-area {
+    padding: 20px 15px;
+    margin-top: 90px;
+    border-radius: 15px;
+  }
+  
+  .left-header {
+    right: 10px;
+    top: 10px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+  
+  .timer-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+  }
+  
+  .qs-text, .score-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-page-container {
+    padding: 10px;
+  }
+  
+  .game-area {
+    padding: 15px 10px;
+    margin-top: 80px;
+    border-radius: 12px;
+  }
+  
+  .left-header {
+    right: 8px;
+    top: 8px;
+    padding: 8px;
+  }
+  
+  .timer-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+  
+  .qs-text, .score-text {
+    font-size: 11px;
+  }
+}
+
+/* Next button styling */
+.next-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.next-question-btn {
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  background: linear-gradient(45deg, #4ecdc4, #44a08d);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  min-width: 200px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.next-question-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 480px) {
+  .next-question-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    min-width: 180px;
+  }
+}
+
+/* Answer Feedback */
+.answer-feedback {
+  text-align: center;
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.answer-feedback.correct {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+  border: 2px solid #2e7d32;
+}
+
+.answer-feedback.incorrect {
+  background: rgba(244, 67, 54, 0.2);
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* Safe area for notches */
+@supports (padding: max(0px)) {
+  .game-page-container {
+    padding-top: max(15px, env(safe-area-inset-top));
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    padding-left: max(15px, env(safe-area-inset-left));
+    padding-right: max(15px, env(safe-area-inset-right));
+  }
+  
+  .left-header {
+    top: max(15px, env(safe-area-inset-top));
+    right: max(15px, env(safe-area-inset-right));
+  }
 }
 
 .submit-section,

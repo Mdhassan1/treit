@@ -25,10 +25,7 @@ const GamePage = () => {
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
 
   // Track the last input the user submitted for the current question.
-  // Use null to indicate "no submission".
   const [lastUserInput, setLastUserInput] = useState(null);
-
-  // Track user's current answer input (for auto-validation when time's up)
   const [currentUserAnswer, setCurrentUserAnswer] = useState("");
 
   // Initialize questions based on game type
@@ -58,8 +55,8 @@ const GamePage = () => {
       setStartTime(Date.now());
       setAnswerSubmitted(false);
       setShowFeedback(false);
-      setLastUserInput(null); // reset last input on new question
-      setCurrentUserAnswer(""); // reset current answer
+      setLastUserInput(null);
+      setCurrentUserAnswer("");
       // Set timer based on game type
       const questionTimer = gameType === GAME_TYPES.CROSSWORD ? 60 : 10;
       setTimer(questionTimer);
@@ -84,24 +81,17 @@ const GamePage = () => {
   }, [timer, showCountdown, gameCompleted, answerSubmitted]);
 
   const handleTimeUp = () => {
-    // For crossword, handle timeout differently
+    // For crossword, handle timeout in the CrosswordGame component
+    // Just mark as submitted and move on
     if (gameType === GAME_TYPES.CROSSWORD) {
-      const scoreData = {
-        foundWords: 0, // User didn't complete in time
-        totalWords: 10, // Assuming 10 words total
-        attempts: 0,
-        timeTaken: 60,
-      };
-      handleAnswerSubmit(scoreData);
+      // The crossword will handle its own timeout submission
+      setAnswerSubmitted(true);
     } else {
-      // Check if user has entered an answer but didn't submit
+      // Handle other game types (existing logic)
       const hasAnswer = currentUserAnswer && currentUserAnswer.trim() !== "";
-
       if (hasAnswer) {
-        // Auto-validate the answer
         const currentQ = questions[currentQuestion];
         let isCorrect = false;
-
         if (gameType === GAME_TYPES.JUMBLE) {
           isCorrect =
             currentUserAnswer.trim().toUpperCase() ===
@@ -109,25 +99,18 @@ const GamePage = () => {
         } else if (gameType === GAME_TYPES.MCQ) {
           isCorrect = currentUserAnswer === currentQ.correct;
         }
-
         setIsCorrectAnswer(isCorrect);
         setLastUserInput(currentUserAnswer);
-
         if (isCorrect) {
-          // Calculate score for auto-submitted correct answer
           const questionScore = calculateScore((Date.now() - startTime) / 1000);
           setScore((prev) => prev + questionScore);
         }
       } else {
-        // No answer provided
         setIsCorrectAnswer(false);
         setLastUserInput(null);
       }
-
       setAnswerSubmitted(true);
       setShowFeedback(true);
-
-      // Auto move to next question after 2 seconds
       setTimeout(() => {
         moveToNextQuestion();
       }, 2000);
@@ -144,9 +127,8 @@ const GamePage = () => {
   const handleAnswerSubmit = (userInput) => {
     if (answerSubmitted || gameCompleted) return;
 
-    // Save last user input (could be empty string)
     setLastUserInput(userInput);
-    setCurrentUserAnswer(userInput); // Also update current answer
+    setCurrentUserAnswer(userInput);
 
     const currentQ = questions[currentQuestion];
     let isCorrect = false;
@@ -155,7 +137,6 @@ const GamePage = () => {
     if (gameType === GAME_TYPES.JUMBLE) {
       const userTrim = (userInput || "").trim();
       if (userTrim.length === 0) {
-        // user submitted empty — treat as "no answer"
         isCorrect = false;
       } else {
         isCorrect = userTrim.toUpperCase() === currentQ.correct.toUpperCase();
@@ -164,7 +145,6 @@ const GamePage = () => {
         }
       }
     } else if (gameType === GAME_TYPES.MCQ) {
-      // For MCQ, we'll consider null/undefined/"" as no answer
       if (userInput === null || userInput === undefined || userInput === "") {
         isCorrect = false;
       } else {
@@ -174,14 +154,15 @@ const GamePage = () => {
         }
       }
     } else if (gameType === GAME_TYPES.CROSSWORD) {
-      // For crossword, userInput is an object returned from CrosswordGame
-      // expected: { foundWords, totalWords, attempts, timeTaken }
+      // For crossword, userInput is an object
       const {
         foundWords = 0,
         totalWords = 0,
         attempts = 0,
         timeTaken = 60,
+        isTimeout = false,
       } = userInput || {};
+
       isCorrect = foundWords > 0;
       const wordsScore = totalWords ? (foundWords / totalWords) * 600 : 0;
       const timeScore = Math.max(0, (60 - timeTaken) / 60) * 300;
@@ -190,12 +171,21 @@ const GamePage = () => {
 
       questionScore = Math.round(wordsScore + timeScore + efficiencyScore);
 
-      // For crossword, if all words are found, go directly to completed page
-      if (foundWords === totalWords && totalWords > 0) {
-        setScore((prev) => prev + questionScore);
-        completeGame();
-        return; // Don't show feedback or set answerSubmitted
-      }
+      // Always add score for crossword
+      setScore((prev) => prev + questionScore);
+
+      // Mark as submitted
+      setIsCorrectAnswer(isCorrect);
+      setAnswerSubmitted(true);
+      setShowFeedback(true);
+
+      // For crossword, ALWAYS move to next question after submission
+      // Whether it's timeout or all words found
+      setTimeout(() => {
+        moveToNextQuestion();
+      }, 1000); // Shorter delay for crossword
+
+      return; // Exit early since we handled navigation
     }
 
     setIsCorrectAnswer(isCorrect);
@@ -207,29 +197,22 @@ const GamePage = () => {
     }
   };
 
-  // Update current user answer when user types (for Jumble and MCQ games)
   const updateCurrentAnswer = (answer) => {
     setCurrentUserAnswer(answer);
   };
 
   const moveToNextQuestion = () => {
+    // Check if this is the last question (6th question, index 5)
+    if (currentQuestion === 5) {
+      completeGame();
+      return;
+    }
+
+    // Only proceed if we have more questions (up to 6 total)
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
-
-      // Only show countdown for questions 1-5 (not for the last question)
-      if (currentQuestion < questions.length - 2) {
-        setShowCountdown(true);
-        setCountdown(3);
-      } else {
-        // For the last question (6th), go directly to the question without countdown
-        setStartTime(Date.now());
-        setAnswerSubmitted(false);
-        setShowFeedback(false);
-        setLastUserInput(null);
-        setCurrentUserAnswer("");
-        const questionTimer = gameType === GAME_TYPES.CROSSWORD ? 60 : 10;
-        setTimer(questionTimer);
-      }
+      setShowCountdown(true);
+      setCountdown(3);
     } else {
       completeGame();
     }
@@ -265,7 +248,7 @@ const GamePage = () => {
       answerSubmitted,
       showFeedback,
       isCorrectAnswer,
-      onAnswerChange: updateCurrentAnswer, // Pass callback to update current answer
+      onAnswerChange: updateCurrentAnswer,
     };
 
     switch (gameType) {
@@ -281,11 +264,10 @@ const GamePage = () => {
   };
 
   const renderFeedback = () => {
-    if (!showFeedback) return null;
+    if (!showFeedback || gameType === GAME_TYPES.CROSSWORD) return null;
 
     const currentQ = questions[currentQuestion];
 
-    // Case 1 & 3: User answered correctly (submitted or auto-submitted)
     if (isCorrectAnswer) {
       return <div className={`answer-feedback correct`}>✓ Correct!</div>;
     }
@@ -295,7 +277,6 @@ const GamePage = () => {
       lastUserInput === undefined ||
       (typeof lastUserInput === "string" && lastUserInput.trim() === "");
 
-    // Case 5: User didn't answer at all (empty input)
     if (noAnswerProvided) {
       return (
         <div className="answer-feedback incorrect">
@@ -305,7 +286,6 @@ const GamePage = () => {
       );
     }
 
-    // Cases 2 & 4: User answered wrong (submitted or auto-submitted)
     return (
       <div className="answer-feedback incorrect">
         ✗ Incorrect <br />
@@ -368,7 +348,7 @@ const GamePage = () => {
         {renderGameComponent()}
         {renderFeedback()}
       </div>
-      {/* Next Button (only shown after answer submission) - Hide for crossword when all words found */}
+      {/* Next Button (only shown after answer submission) - Hide for crossword */}
       {answerSubmitted && gameType !== GAME_TYPES.CROSSWORD && (
         <div className="next-section">
           <button className="next-question-btn" onClick={moveToNextQuestion}>

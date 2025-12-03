@@ -1,4 +1,3 @@
-// CrosswordGame.jsx
 import React, { useState, useEffect, useRef } from "react";
 import "./CrosswordGame.css";
 
@@ -19,8 +18,14 @@ const CrosswordGame = ({
   const [foundWords, setFoundWords] = useState([]);
   const [attempts, setAttempts] = useState(0);
   const gridRef = useRef(null);
+  const timeoutProcessedRef = useRef(false);
 
-  // Prevent double-processing of the same selection (e.g. duplicate onMouseUp)
+  // Touch specific refs
+  const touchStartRef = useRef(null);
+  const touchCurrentRef = useRef(null);
+  const lastTouchTimeRef = useRef(0);
+
+  // Prevent double-processing of the same selection
   const processingRef = useRef(false);
 
   // Safe access to question properties
@@ -28,8 +33,7 @@ const CrosswordGame = ({
   const words = question?.words || { across: [], down: [] };
   const clue = question?.clue || "Solve the crossword puzzle";
 
-  // Build ALL valid words list (including duplicates) so totalWords = across.length + down.length
-  // But we will still keep foundWords unique (no duplicate display)
+  // Build ALL valid words list
   const allValidWords = React.useMemo(() => {
     const acrossWords = Array.isArray(words.across) ? words.across : [];
     const downWords = Array.isArray(words.down) ? words.down : [];
@@ -43,10 +47,10 @@ const CrosswordGame = ({
       ),
     ].filter((word) => word.length > 0);
 
-    console.log("All valid words (with duplicates for total):", allWordsArray);
     return allWordsArray;
   }, [words]);
 
+  // Reset state when question changes
   useEffect(() => {
     if (!answerSubmitted) {
       setSelectedCells([]);
@@ -55,41 +59,9 @@ const CrosswordGame = ({
       setTimeoutCells([]);
       setFoundWords([]);
       setAttempts(0);
+      timeoutProcessedRef.current = false;
     }
   }, [question, answerSubmitted]);
-
-  // Handle timeout
-  useEffect(() => {
-    if (timer === 0 && !answerSubmitted) {
-      const allCells = [];
-      grid.forEach((row, rowIndex) => {
-        row.forEach((cell, colIndex) => {
-          if (cell && cell !== " ") {
-            allCells.push(`${rowIndex}-${colIndex}`);
-          }
-        });
-      });
-      setTimeoutCells(allCells);
-
-      setTimeout(() => {
-        const scoreData = {
-          foundWords: foundWords.length,
-          totalWords: allValidWords.length,
-          attempts: attempts,
-          timeTaken: 60,
-        };
-        onAnswerSubmit(scoreData);
-      }, 1000);
-    }
-  }, [
-    timer,
-    answerSubmitted,
-    grid,
-    foundWords,
-    attempts,
-    onAnswerSubmit,
-    allValidWords,
-  ]);
 
   // Clear wrong cells after 1 second
   useEffect(() => {
@@ -102,21 +74,62 @@ const CrosswordGame = ({
     }
   }, [wrongCells]);
 
-  // Check if all words are found (using total words including duplicates)
+  // Handle timeout
+  useEffect(() => {
+    if (timer === 0 && !answerSubmitted && !timeoutProcessedRef.current) {
+      console.log("⏰ Timeout triggered in CrosswordGame");
+      timeoutProcessedRef.current = true;
+
+      const allCells = [];
+      grid.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell && cell !== " ") {
+            allCells.push(`${rowIndex}-${colIndex}`);
+          }
+        });
+      });
+      setTimeoutCells(allCells);
+
+      // Submit immediately with timeout results
+      const scoreData = {
+        foundWords: foundWords.length,
+        totalWords: allValidWords.length,
+        attempts: attempts,
+        timeTaken: 60,
+        isTimeout: true,
+      };
+
+      console.log("Crossword timeout score data:", scoreData);
+      onAnswerSubmit(scoreData);
+    }
+  }, [
+    timer,
+    answerSubmitted,
+    grid,
+    foundWords,
+    attempts,
+    allValidWords,
+    onAnswerSubmit,
+  ]);
+
+  // Check if all words are found
   useEffect(() => {
     if (
       foundWords.length === allValidWords.length &&
       allValidWords.length > 0 &&
-      !answerSubmitted
+      !answerSubmitted &&
+      !timeoutProcessedRef.current
     ) {
-      console.log("🎉 All words found! Going to score popup...");
+      console.log("🎉 All words found!");
       const scoreData = {
         foundWords: foundWords.length,
         totalWords: allValidWords.length,
         attempts: attempts,
         timeTaken: 60 - timer,
+        isTimeout: false,
       };
-      // Immediately submit and go to score popup without showing "Correct" feedback
+
+      console.log("Crossword completion score data:", scoreData);
       onAnswerSubmit(scoreData);
     }
   }, [
@@ -171,8 +184,56 @@ const CrosswordGame = ({
       .join("");
   };
 
+  // Handle touch start
+  const handleTouchStart = (row, col, e) => {
+    if (answerSubmitted || !grid[row]?.[col] || grid[row][col] === " ") return;
+
+    e.preventDefault();
+    const now = Date.now();
+
+    // Prevent double taps
+    if (now - lastTouchTimeRef.current < 300) return;
+    lastTouchTimeRef.current = now;
+
+    touchStartRef.current = { row, col };
+    setIsSelecting(true);
+    setSelectedCells([`${row}-${col}`]);
+    setSelectionDirection(null);
+  };
+
+  // Handle touch move
+  const handleTouchMove = (row, col, e) => {
+    if (!isSelecting || !grid[row]?.[col] || grid[row][col] === " ") return;
+
+    e.preventDefault();
+    touchCurrentRef.current = { row, col };
+
+    // Process cell selection
+    processSelection(row, col);
+  };
+
+  // Handle touch end
+  const handleTouchEnd = (e) => {
+    if (!isSelecting) return;
+
+    e.preventDefault();
+    setIsSelecting(false);
+
+    // Process the final selection
+    if (touchCurrentRef.current) {
+      processSelectionComplete();
+    } else if (touchStartRef.current) {
+      // Single tap - clear selection
+      setSelectedCells([]);
+    }
+
+    // Reset touch refs
+    touchStartRef.current = null;
+    touchCurrentRef.current = null;
+  };
+
+  // Mouse event handlers (for desktop)
   const handleCellMouseDown = (row, col) => {
-    // safety: don't start on empty cell or after submission
     if (answerSubmitted || !grid[row]?.[col] || grid[row][col] === " ") return;
 
     setIsSelecting(true);
@@ -182,10 +243,19 @@ const CrosswordGame = ({
 
   const handleCellMouseEnter = (row, col) => {
     if (!isSelecting || !grid[row]?.[col] || grid[row][col] === " ") return;
+    processSelection(row, col);
+  };
 
+  const handleCellMouseUp = () => {
+    if (!isSelecting) return;
+    setIsSelecting(false);
+    processSelectionComplete();
+  };
+
+  // Common selection processing
+  const processSelection = (row, col) => {
     const currentCell = `${row}-${col}`;
 
-    // If we have only one cell selected, determine direction
     if (selectedCells.length === 1) {
       const [firstRow, firstCol] = selectedCells[0].split("-").map(Number);
 
@@ -198,15 +268,12 @@ const CrosswordGame = ({
       }
     }
 
-    // If we have a direction, get all cells in that line
     if (selectionDirection) {
       const newSelectedCells = getCellsInLine(selectedCells[0], currentCell);
       if (newSelectedCells.length > 0) {
         setSelectedCells(newSelectedCells);
       }
-    }
-    // If no direction yet but we're on the same row or column, try to set direction
-    else if (selectedCells.length === 1) {
+    } else if (selectedCells.length === 1) {
       const [firstRow, firstCol] = selectedCells[0].split("-").map(Number);
 
       if (row === firstRow && Math.abs(col - firstCol) > 0) {
@@ -221,62 +288,39 @@ const CrosswordGame = ({
     }
   };
 
-  const handleCellMouseUp = () => {
-    if (!isSelecting) return;
-    setIsSelecting(false);
-
-    // Guard: prevent double-processing
+  // Process completed selection
+  const processSelectionComplete = () => {
     if (processingRef.current) {
       setSelectedCells([]);
       return;
     }
     processingRef.current = true;
 
-    // Ensure processingRef is freed after a short delay
     setTimeout(() => {
       processingRef.current = false;
     }, 60);
 
     if (selectedCells.length > 1) {
       const selectedWord = getWordFromSelection(selectedCells);
-      // increment attempts only once per processing
       setAttempts((prev) => prev + 1);
 
       const selectedWordUpper = selectedWord.toUpperCase();
-
-      console.log("Selected word:", selectedWordUpper);
-      console.log("All valid words:", allValidWords);
-      console.log("Already found words:", foundWords);
-
-      // Check if this is a valid word (we allow allValidWords which may contain duplicates)
       const isWordValid = allValidWords.includes(selectedWordUpper);
-
-      // Check if the word was not already recorded in FOUND list (prevent duplicates)
       const isWordNew = !foundWords.includes(selectedWordUpper);
 
-      console.log("Is word valid?", isWordValid);
-      console.log("Is word new?", isWordNew);
-
       if (isWordValid && isWordNew) {
-        // Mark cells as correct (idempotent)
         setCorrectCells((prev) => {
           const combined = [...prev, ...selectedCells];
-          // dedupe cell ids
           return Array.from(new Set(combined));
         });
 
-        // Add found word if not already present (functional and idempotent)
         setFoundWords((prev) => {
           if (prev.includes(selectedWordUpper)) return prev;
-          const newFound = [...prev, selectedWordUpper];
-          console.log("New found words:", newFound);
-          return newFound;
+          return [...prev, selectedWordUpper];
         });
 
-        // clear selection visually
         setSelectedCells([]);
       } else {
-        // Mark as wrong temporarily
         setWrongCells([...selectedCells]);
       }
     } else {
@@ -289,7 +333,6 @@ const CrosswordGame = ({
     const [endRow, endCol] = endCell.split("-").map(Number);
     const cells = [];
 
-    // If same row (across selection)
     if (startRow === endRow) {
       const minCol = Math.min(startCol, endCol);
       const maxCol = Math.max(startCol, endCol);
@@ -297,13 +340,10 @@ const CrosswordGame = ({
         if (grid[startRow]?.[col] && grid[startRow][col] !== " ") {
           cells.push(`${startRow}-${col}`);
         } else {
-          // stop if empty encountered
           break;
         }
       }
-    }
-    // If same column (down selection)
-    else if (startCol === endCol) {
+    } else if (startCol === endCol) {
       const minRow = Math.min(startRow, endRow);
       const maxRow = Math.max(startRow, endRow);
       for (let row = minRow; row <= maxRow; row++) {
@@ -337,34 +377,46 @@ const CrosswordGame = ({
         Words Found: {foundWords.length} / {allValidWords.length}
       </div>
 
-      <div
-        className="crossword-grid"
-        ref={gridRef}
-        onMouseLeave={() => {
-          setIsSelecting(false);
-          if (selectedCells.length > 0) {
-            handleCellMouseUp();
-          }
-        }}
-        onMouseUp={handleCellMouseUp}
-      >
-        {grid.map((row, rowIndex) => (
-          <div key={rowIndex} className="crossword-row">
-            {row.map((cell, cellIndex) => (
-              <div
-                key={cellIndex}
-                className={getCellClass(rowIndex, cellIndex)}
-                onMouseDown={() => handleCellMouseDown(rowIndex, cellIndex)}
-                onMouseEnter={() => handleCellMouseEnter(rowIndex, cellIndex)}
-                // keep onMouseUp on grid to avoid some double triggers, but handler is guarded
-                onMouseUp={handleCellMouseUp}
-              >
-                {cell && cell !== " " ? cell : ""}
-              </div>
-            ))}
-          </div>
-        ))}
+      <div className="crossword-grid-container">
+        <div
+          className="crossword-grid"
+          ref={gridRef}
+          onMouseLeave={() => {
+            setIsSelecting(false);
+            if (selectedCells.length > 0) {
+              processSelectionComplete();
+            }
+          }}
+          onTouchEnd={handleTouchEnd}
+          onMouseUp={handleCellMouseUp}
+        >
+          {grid.map((row, rowIndex) => (
+            <div key={rowIndex} className="crossword-row">
+              {row.map((cell, cellIndex) => (
+                <div
+                  key={cellIndex}
+                  className={getCellClass(rowIndex, cellIndex)}
+                  onMouseDown={() => handleCellMouseDown(rowIndex, cellIndex)}
+                  onMouseEnter={() => handleCellMouseEnter(rowIndex, cellIndex)}
+                  onTouchStart={(e) => handleTouchStart(rowIndex, cellIndex, e)}
+                  onTouchMove={(e) => handleTouchMove(rowIndex, cellIndex, e)}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseUp={handleCellMouseUp}
+                >
+                  {cell && cell !== " " ? cell : ""}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Show timeout message */}
+      {timeoutCells.length > 0 && (
+        <div className="crossword-timeout-message">
+          ⏰ Time's up! Moving to next question...
+        </div>
+      )}
     </div>
   );
 };

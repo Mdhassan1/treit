@@ -35,56 +35,80 @@ const ReviewPopup = () => {
   return (
     <div className="review-popup-container">
       <div className="review-popup">
-        <h1 className="review-title">Share Your Feedback</h1>
-        <p className="review-subtitle">
-          We'd love to hear about your experience!
-        </p>
+        <div className="review-header">
+          <h1 className="review-title">Share Your Feedback</h1>
+          <p className="review-subtitle">
+            We'd love to hear about your experience!
+          </p>
+        </div>
 
         <div className="review-form">
-          <textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Tell us what you think about the game..."
-            className="review-textarea"
-            rows="6"
-          />
+          <div className="input-group">
+            <label htmlFor="review-textarea" className="input-label">
+              Your Feedback
+            </label>
+            <textarea
+              id="review-textarea"
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="Tell us what you think about the game..."
+              className="review-textarea"
+              rows="5"
+              maxLength="500"
+            />
+          </div>
 
           <div className="rating-section">
-            <p>How was your experience?</p>
+            <h3 className="rating-title">How was your experience?</h3>
             <div className="rating-buttons">
+              <button
+                className={`rating-btn ${
+                  selectedRating === "excellent" ? "selected" : ""
+                }`}
+                onClick={() => handleRatingSelect("excellent")}
+                aria-label="Excellent rating"
+              >
+                <span className="rating-emoji">🤩</span>
+                <span className="rating-text">Excellent</span>
+              </button>
               <button
                 className={`rating-btn ${
                   selectedRating === "good" ? "selected" : ""
                 }`}
                 onClick={() => handleRatingSelect("good")}
+                aria-label="Good rating"
               >
-                😊 Good
+                <span className="rating-emoji">😊</span>
+                <span className="rating-text">Good</span>
               </button>
               <button
                 className={`rating-btn ${
                   selectedRating === "bad" ? "selected" : ""
                 }`}
                 onClick={() => handleRatingSelect("bad")}
+                aria-label="Bad rating"
               >
-                😞 Bad
-              </button>
-              <button
-                className={`rating-btn ${
-                  selectedRating === "excellent" ? "selected" : ""
-                }`}
-                onClick={() => handleRatingSelect("excellent")}
-              >
-                🤩 Excellent
+                <span className="rating-emoji">😞</span>
+                <span className="rating-text">Bad</span>
               </button>
             </div>
           </div>
 
           <div className="review-buttons">
-            <button className="submit-review-btn" onClick={handleSubmitReview}>
-              Submit Review
+            <button
+              className="submit-review-btn"
+              onClick={handleSubmitReview}
+              disabled={!reviewText.trim() && !selectedRating}
+            >
+              <span className="btn-text">Submit Review</span>
+              <span className="btn-icon">✓</span>
             </button>
-            <button className="skip-review-btn" onClick={() => navigate("/")}>
-              Skip
+            <button
+              className="skip-review-btn"
+              onClick={() => navigate("/")}
+              aria-label="Skip review"
+            >
+              Skip for Now
             </button>
           </div>
         </div>

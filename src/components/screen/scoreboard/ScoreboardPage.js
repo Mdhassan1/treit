@@ -87,14 +87,16 @@ const ScoreboardPage = () => {
                       {score.userDetails?.school || "Unknown School"}
                     </div>
                   </div>
-                  <div className="score-value">{score.score} pts</div>
-                  {/*<button
+                  <div className="score-value">
+                    {score.score.toFixed(2)} pts
+                  </div>
+                  {/* <button
                     className="delete-btn"
                     onClick={() => deleteScore(index)}
                     title="Delete this score"
                   >
                     🗑️
-                  </button>*/}
+                  </button> */}
                 </div>
               ))}
             </div>
